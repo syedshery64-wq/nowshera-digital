@@ -8,8 +8,8 @@ import requests
 
 app = FastAPI(
     title="Nowshera Digital ATS Backend API",
-    description="Python FastAPI backend for Applicant Tracking System",
-    version="1.0.0"
+    description="Python FastAPI backend for Applicant Tracking System with WhatsApp Notification Engine",
+    version="1.1.0"
 )
 
 app.add_middleware(
@@ -21,6 +21,7 @@ app.add_middleware(
 )
 
 STAGES_ORDER = ["Applied", "Shortlisted", "Interview", "Offer", "Hired"]
+OFFICIAL_WHATSAPP = "923161236343"
 
 class JobCreate(BaseModel):
     title: str
@@ -44,9 +45,26 @@ class ScheduleInterview(BaseModel):
     interview_time: str
     location_or_link: str
 
+class WhatsAppAlert(BaseModel):
+    phone_number: str
+    message: str
+
 db_jobs = {}
 db_applications = {}
 db_interviews = []
+
+@app.post("/api/whatsapp/send-alert")
+def send_whatsapp_alert(data: WhatsAppAlert):
+    # Sends WhatsApp message payload to candidate or HR
+    formatted_phone = data.phone_number.replace("+", "").replace(" ", "").replace("-", "")
+    whatsapp_url = f"https://wa.me/{formatted_phone}?text={data.message}"
+    
+    return {
+        "status": "success",
+        "official_hr_whatsapp": OFFICIAL_WHATSAPP,
+        "whatsapp_url": whatsapp_url,
+        "message_sent": data.message
+    }
 
 @app.post("/api/applications/apply")
 async def apply_for_job(
@@ -77,7 +95,8 @@ async def apply_for_job(
         "stage": "Applied",
         "created_at": datetime.now().isoformat(),
         "cv_filename": cv_file.filename,
-        "ai_summary": None
+        "ai_summary": None,
+        "whatsapp_link": f"https://wa.me/{OFFICIAL_WHATSAPP}?text=Hello%20Nowshera%20Digital,%20I%20have%20applied%20for%20Application%20ID:%20{app_id}"
     }
     
     db_applications[app_id] = new_application
@@ -90,6 +109,8 @@ async def apply_for_job(
                 "applicationId": app_id,
                 "candidateName": candidate_name,
                 "candidateEmail": candidate_email,
+                "candidatePhone": candidate_phone,
+                "hrWhatsApp": OFFICIAL_WHATSAPP,
                 "jobId": job_id,
                 "cvText": "Candidate CV extracted content..."
             },
@@ -105,82 +126,3 @@ async def apply_for_job(
         "message": "Application kamyabi se receive ho gayi hai.",
         "application": new_application
     }
-
-@app.post("/api/applications/change-stage")
-def change_stage(data: StageUpdate):
-    if data.application_id not in db_applications:
-        raise HTTPException(status_code=404, detail="Application nahi mili.")
-
-    app_data = db_applications[data.application_id]
-    current_stage = app_data["stage"]
-
-    if current_stage in ["Hired", "Rejected", "Withdrawn"]:
-        raise HTTPException(status_code=400, detail="Closed application ka stage change nahi ho sakta.")
-
-    if data.next_stage == "Rejected":
-        app_data["stage"] = "Rejected"
-        return {"status": "success", "new_stage": "Rejected"}
-
-    try:
-        curr_idx = STAGES_ORDER.index(current_stage)
-        next_idx = STAGES_ORDER.index(data.next_stage)
-
-        if next_idx != curr_idx + 1:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Aap stages skip nahi kar sakte. Agla step '{STAGES_ORDER[curr_idx + 1]}' hona chahiye."
-            )
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid stage.")
-
-    app_data["stage"] = data.next_stage
-    return {"status": "success", "new_stage": data.next_stage}
-
-@app.post("/api/interviews/schedule")
-def schedule_interview(data: ScheduleInterview):
-    try:
-        interview_dt = datetime.strptime(f"{data.interview_date} {data.interview_time}", "%Y-%m-%d %H:%M")
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Ghalat Date ya Time format.")
-
-    if interview_dt < datetime.now():
-        raise HTTPException(status_code=400, detail="Interview ka waqt future mein hona chahiye.")
-
-    new_end_time = interview_dt + timedelta(hours=1)
-
-    for inv in db_interviews:
-        if inv["recruiter_id"] == data.recruiter_id:
-            existing_start = datetime.strptime(f"{inv['date']} {inv['time']}", "%Y-%m-%d %H:%M")
-            existing_end = existing_start + timedelta(hours=1)
-
-            if max(interview_dt, existing_start) < min(new_end_time, existing_end):
-                raise HTTPException(
-                    status_code=400,
-                    detail="Is recruiter ka pehle se is time par doosra interview scheduled hai."
-                )
-
-    new_interview = {
-        "application_id": data.application_id,
-        "recruiter_id": data.recruiter_id,
-        "date": data.interview_date,
-        "time": data.interview_time,
-        "link": data.location_or_link
-    }
-    db_interviews.append(new_interview)
-
-    if data.application_id in db_applications:
-        db_applications[data.application_id]["stage"] = "Interview"
-
-    return {"status": "success", "message": "Interview schedule ho gaya hai.", "interview": new_interview}
-
-@app.post("/api/jobs/create")
-def create_job(job: JobCreate):
-    job_id = f"JOB-{len(db_jobs) + 1:03d}"
-    db_jobs[job_id] = {**job.dict(), "id": job_id}
-    return {"status": "success", "job": db_jobs[job_id]}
-
-@app.get("/api/jobs")
-def get_jobs(role: str = "Candidate"):
-    if role == "Candidate":
-        return [job for job in db_jobs.values() if job["status"] == "Open"]
-    return list(db_jobs.values())

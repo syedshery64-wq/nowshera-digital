@@ -3,14 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nowshera Digital - AI Applicant Tracking System</title>
+  <title>Nowshera Digital - AI ATS & WhatsApp Integration</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
-  <div class="p-8 text-center">
-    <h1 class="text-3xl font-bold text-indigo-400 mb-4">Nowshera Digital ATS Project</h1>
-    <p class="text-slate-300">Open index.html in your web browser to run the complete ATS Single-Page Application.</p>
-  </div>
+  <!-- Header with WhatsApp Hotline -->
+  <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50 flex flex-wrap justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl">ND</div>
+      <div>
+        <h1 class="text-lg font-bold text-white">Nowshera Digital ATS</h1>
+        <p class="text-xs text-slate-400">AI & WhatsApp Recruitment Suite</p>
+      </div>
+    </div>
+    
+    <!-- WhatsApp Quick Contact Button -->
+    <a href="https://wa.me/923161236343?text=Hello%20Nowshera%20Digital%20HR%20Team," target="_blank" 
+       class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-lg transition-all">
+      <i class="fa-brands fa-whatsapp text-lg"></i>
+      <span>HR WhatsApp: 0316-1236343</span>
+    </a>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-6 text-center">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-2xl mt-6">
+      <span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1 rounded-full border border-emerald-500/20">
+        WhatsApp Notifications Connected
+      </span>
+      <h2 class="text-3xl font-extrabold text-white mt-4">Nowshera Digital Applicant Tracking System</h2>
+      <p class="text-slate-300 mt-2 max-w-2xl mx-auto">
+        Full-stack ATS with Gemini 1.5 Flash AI, Supabase DB, n8n Automation Engine, and automated WhatsApp candidate communication via <strong class="text-emerald-400">0316-1236343</strong>.
+      </p>
+
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+        <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-700">
+          <div class="text-emerald-400 font-bold text-lg mb-1"><i class="fa-brands fa-whatsapp mr-2"></i> WhatsApp Alerts</div>
+          <p class="text-xs text-slate-400">Candidates receive instant status updates and single-click WhatsApp HR chat links.</p>
+        </div>
+        <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-700">
+          <div class="text-indigo-400 font-bold text-lg mb-1"><i class="fa-solid fa-robot mr-2"></i> Gemini AI Engine</div>
+          <p class="text-xs text-slate-400">Generates 3-part structured candidate summaries with anti-bias guardrails.</p>
+        </div>
+        <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-700">
+          <div class="text-blue-400 font-bold text-lg mb-1"><i class="fa-solid fa-database mr-2"></i> Supabase & n8n</div>
+          <p class="text-xs text-slate-400">Real-time DB sync with secure API key protection & failover retry mechanics.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-center gap-4">
+        <a href="https://wa.me/923161236343?text=Hello%20Nowshera%20Digital,%20I%20have%20a%20question%20about%20my%20job%20application" 
+           target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl transition">
+          Test Candidate WhatsApp Link (0316-1236343)
+        </a>
+      </div>
+    </div>
+  </main>
 </body>
 </html>

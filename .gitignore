@@ -1,16 +1,5 @@
-# Secret & Environment Variables
+# Secret Keys & Cache
 .env
-.env.local
-*.env
-
-# Python Cache & Virtual Environments
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
 venv/
-.venv/
-env/
-
-# System Files
-.DS_Store
-Thumbs.db

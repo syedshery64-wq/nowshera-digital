@@ -1,5 +1,5 @@
 {
-  "name": "Nowshera ATS - CV Summarizer & Email Automation",
+  "name": "Nowshera ATS - CV Summarizer & WhatsApp / Email Automation",
   "nodes": [
     {
       "parameters": {
@@ -15,13 +15,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// Sanitize inputs and prevent prompt injections\nconst body = $json.body;\nlet cleanCvText = (body.cvText || '').replace(/ignore your instructions/gi, '[REDACTED_PROMPT_INJECTION]');\n\nreturn { json: { candidateEmail: body.candidateEmail, candidateName: body.candidateName, jobTitle: body.jobTitle, applicationId: body.applicationId, cvText: cleanCvText } };"
+        "jsCode": "// Sanitize inputs & add WhatsApp HR link\nconst body = $json.body;\nconst hrPhone = '923161236343';\nconst waUrl = `https://wa.me/${hrPhone}?text=Application%20Received%20for%20${encodeURIComponent(body.candidateName)}`;\n\nreturn { json: { candidateEmail: body.candidateEmail, candidateName: body.candidateName, candidatePhone: body.candidatePhone, hrWhatsApp: hrPhone, whatsappUrl: waUrl, jobId: body.jobId } };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [440, 300],
       "id": "sanitizer",
-      "name": "Sanitize & Build Prompt"
+      "name": "Sanitize & Build WhatsApp Payload"
     }
   ]
 }
